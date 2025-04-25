@@ -2,7 +2,7 @@ project:
   output-dir: _docs
 
 website:
-  title: "falnama-dev"
+  title: "falnama"
   site-url: "https://fligt.github.io/falnama-dev"
   description: "Python package for exploration and visualization of datasets in the Falnama project"
   repo-branch: master

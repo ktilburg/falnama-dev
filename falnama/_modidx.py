@@ -4,5 +4,5 @@ d = { 'settings': { 'branch': 'master',
                 'doc_baseurl': '/falnama-dev',
                 'doc_host': 'https://fligt.github.io',
                 'git_url': 'https://github.com/fligt/falnama-dev',
-                'lib_path': 'falnama_dev'},
-  'syms': {'falnama_dev.core': {'falnama_dev.core.foo': ('core.html#foo', 'falnama_dev/core.py')}}}
+                'lib_path': 'falnama'},
+  'syms': {'falnama.core': {'falnama.core.foo': ('core.html#foo', 'falnama/core.py')}}}
