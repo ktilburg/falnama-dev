@@ -3,12 +3,12 @@
 # %% auto 0
 __all__ = ['Downloader']
 
-# %% ../nbs/10_pooch.ipynb 16
+# %% ../nbs/10_pooch.ipynb 18
 import pooch
 import tqdm
 from glob import glob
 
-# %% ../nbs/10_pooch.ipynb 17
+# %% ../nbs/10_pooch.ipynb 19
 class Downloader:
     def __init__(self):
         '''Creates the downloader object, use this to call it's methods.'''
