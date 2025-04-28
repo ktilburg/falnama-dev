@@ -29,7 +29,8 @@ class Downloader:
                             "WM-71803-29_400_500_50.datastack" : "82647269b4b9361f9596f327e64f3b17a1b0512628eb9ed82c344edc796ae26c",
                             "WM-71803-30_250_300_50.datastack" : "af8e1bd23b5cec8e4e710dce050a6ade6bd94660d605650cc6bf27b1fd7d5076",
                             "WM-71803-31_400_600_50.datastack" : "99a747ddf664263f4b1743db0e13657a2e6313fd6aed1088df47c691b6a40c75",
-                            "WM-71803-35_400_500_50.datastack" : "9742160af6b274fed19dd5e1b1ab7ef4ffe7c430e9063ee3b0924bb17309a42e"})
+                            "WM-71803-35_400_500_50.datastack" : "9742160af6b274fed19dd5e1b1ab7ef4ffe7c430e9063ee3b0924bb17309a42e"},
+                    env='FALNAMA_CACHE')
     
     def show_registry(self):
         '''Prints all files currently in the downloader registry.'''
