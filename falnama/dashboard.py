@@ -232,7 +232,7 @@ class Dashboard:
         self.extent = ds.read('imvis_extent')
         # plots the image on the ax_image_plot
         self.ax_image_plot.imshow(self.image, extent=self.extent)
-        self.ax_image_plot.set_title(f'[{index}] {self.plot_data[index]['object_name']}')
+        self.ax_image_plot.set_title(f'[{index}] {self.plot_data[index]["object_name"]}')
         # update the elemgrid to contain the new element maps
         self._update_elemap_plot(index, ds)
         # fills the regions of interest based on saved data
