@@ -3,20 +3,40 @@ project:
 
 format:
   html:
-    theme: cosmo
+    theme: 
+      light: flatly
+      dark: darkly
     css: styles.css
     toc: true
     keep-md: true
   commonmark: default
 
 website:
-  twitter-card: true
-  open-graph: true
   repo-actions: [issue]
+  page-navigation: true
+  search:
+    location: navbar
+    type: textbox
   navbar:
     background: primary
-    search: true
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            href: https://github.com/fligt/falnama-dev
+          - text: Start Collaborating
+            href: https://github.com/fligt/falnama-dev/fork
+          - text: Report a Bug
+            href: https://github.com/fligt/falnama-dev/issues
   sidebar:
-    style: floating
+    style: docked
+    search: true
+    contents:
+      - text: Introduction
+        href: index.ipynb
+      - section: Explorations
+        contents: explorations/*
+      - section: Explanations
+        contents: explanations/*
 
-metadata-files: [nbdev.yml, sidebar.yml]
+metadata-files: [nbdev.yml]
