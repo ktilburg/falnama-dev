@@ -12,7 +12,7 @@ from glob import glob
 class Downloader:
     def __init__(self):
         '''Creates the downloader object, use this to call it's methods.'''
-        self.downloader = pooch.create(path=pooch.os_cache("falnama-notebooks"),
+        self.downloader = pooch.create(path=pooch.os_cache("falnama"),
                     base_url="https://f002.backblazeb2.com/file/falnama-data/datastacks/",
                     registry={"WM-71803-01_400_600_50.datastack" : "ee2af34dcbea270de797003500400e7f0655654838bafc880d0943a440283411",
                             "WM-71803-03_250_300_50.datastack" : "ad5bff448f32d4ac4dac46ae6e516af1c96f64e9ced17e3021124f21a5dd4669",
