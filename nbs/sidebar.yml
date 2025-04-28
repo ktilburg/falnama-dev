@@ -1,9 +1,0 @@
-website:
-  sidebar:
-    contents:
-        showcase:
-          - index.ipynb
-        documentation:
-          - 00_core.ipynb
-          - 10_pooch.ipynb
-          - 20_dashboard.ipynb
