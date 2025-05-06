@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['Dashboard']
 
-# %% ../nbs/kitchen/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 53
+# %% ../nbs/kitchen/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 46
 import maxrf4u
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -14,7 +14,7 @@ import numpy as np
 import os
 import re
 
-# %% ../nbs/kitchen/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 54
+# %% ../nbs/kitchen/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 47
 class Dashboard:
 
     def __init__(self, datastack_files=None, roi_count=4, data=None):
