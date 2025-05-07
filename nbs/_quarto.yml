@@ -34,9 +34,9 @@ website:
     contents:
       - text: Welcome
         href: index.ipynb
-      - section: A magnificent manuscript 
+      - section: Gallery
         contents: gallery/*
-      - section: Code kitchen
-        contents: kitchen/*
+      - section: FUNCTIONS
+        contents: functions/*
 
 metadata-files: [nbdev.yml]
