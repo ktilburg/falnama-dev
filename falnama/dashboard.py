@@ -17,7 +17,7 @@ import re
 # %% ../nbs/functions/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 20
 class Dashboard:
 
-    def __init__(self, datastack_files=None, roi_count=4, data=None):
+    def __init__(self, datastack_file=None, roi_count=4, data=None, eq_emap=False):
         '''Create a dashboard for analyzing spectras on regions of interest
 
         datastack_files: A list of datastack_file paths, does accept a singular string.
@@ -29,24 +29,22 @@ class Dashboard:
         self.roi_count = roi_count
         
         # creates the list of datastack_files
-        self.datastack_files = self._set_datastack_files(datastack_files)
+        self.datastack_file = datastack_file
         
-        # creates the list containing saved information per datastack
+        # creates a dictionary to store save data
         if data == None:
-            self.plot_data = self._create_data_list()
+            self.plot_data = self._create_data_dict()
         else:
             self.set_data(data)
-        # sets the current index of the initial datastack
-        self.current_index = 0
-
+            
         # sets the current emap showing to not equalize
-        self.eq_hist = False
+        self.eq_hist = eq_emap
         
         # creates a list that can save the patches.
         self.patches = [None] * self.roi_count
 
         # gets the object names from the file_paths
-        self._get_object_names()
+        self._get_object_name()
 
         # creates the layout of the figure
         self._create_layout()
@@ -55,42 +53,24 @@ class Dashboard:
         self._create_image_plot()
 
         # creates the grid for the element maps and adds all the axes to self.elem_axs
-        self._create_elemap_plot(self.current_index)
+        self._create_elemap_plot()
 
         # creates the grid for the regions of interest and creates self.roi_axs/self.spectrum_axs/self.mos_axs
         self._create_roi_plot()
 
         # swaps to the first datastack in the list
-        self.swap_image(self.current_index)
+        self.reload_dash()
 
-    def _set_datastack_files(self, datastack_files):
-        # raise error if datastack_files is not given
-        if datastack_files == None:    
-            raise ValueError('datastack_files can not be empty')
-        # if datastack_files is a string then add that to a list
-        if not isinstance(datastack_files, list):
-            datastack_list = []
-            datastack_list.append(datastack_files)
-            return datastack_list
-        # returns datastack_files if it is a list
-        else:
-            return datastack_files
-
-    def _create_data_list(self):
-        # initialize list for storing the plot data
-        plot_data = []
-        # for every datastack_file be able to save object_name, regions of interest and the corresponding moseley element spectra
-        for datastack_file in self.datastack_files:
-            plot_data.append({
-                'object_name' : '',
-                'rois' : [None] * self.roi_count,
-                'mos_elements' : [None] * self.roi_count
-            })
+    def _create_data_dict(self):
+        plot_data = {
+            'object_name' : '',
+            'rois' : [None] * self.roi_count,
+            'mos_elements' : [None] * self.roi_count
+            }
         return plot_data  
         
-    def _get_object_names(self):
-        for i, datastack in enumerate(self.datastack_files):
-            self.plot_data[i]['object_name'] = re.sub(r'.*(71803-\d\d).*', r'\1', datastack)
+    def _get_object_name(self):
+        self.plot_data['object_name'] = re.sub(r'.*(71803-\d\d).*', r'\1', self.datastack_file)
         
     def _create_layout(self):
         # initialize figure
@@ -109,7 +89,7 @@ class Dashboard:
         # create ax and add to top grid
         self.ax_image_plot = self.fig.add_subplot(self.top_grid[0])
 
-    def _create_elemap_plot(self, index):
+    def _create_elemap_plot(self):
         # create elemgrid subgridspec and add to the top_grid gridspec
         self.elemgrid = self.top_grid[1:].subgridspec(3,6)
         # initialize list for storing elementmap axes
@@ -122,7 +102,7 @@ class Dashboard:
             ax.set_axis_off()
             self.elem_axs.append(ax)
     
-    def _update_elemap_plot(self, index, ds):
+    def _update_elemap_plot(self, ds):
         # get the element_maps and elements from the datastack
         element_maps = ds.read('nmf_elementmaps')
         atom_nums = ds.read('nmf_atomnums')
@@ -157,16 +137,16 @@ class Dashboard:
             ax_mos.set_yticks([])
             ax_spectrum.sharex(ax_mos)
     
-    def _update_roi_plot(self, index):
+    def _update_roi_plot(self):
         # first clears the bottom grid
         self._clear_bottom_grid()
         # sets the roi plots again based on the location stored in the list
-        for i, roi in enumerate(self.plot_data[index]['rois']):
+        for i, roi in enumerate(self.plot_data['rois']):
             self.roi_axs[i].set_title(f'[{i}]')
             self.roi_axs[i].set_axis_off()
-            if self.plot_data[index]['rois'][i] != None:
+            if self.plot_data['rois'][i] != None:
                 self._plot_roi(self.roi_axs[i], roi[0], roi[1])
-                self._plot_spectrum(index, self.spectrum_axs[i], roi[0], roi[1])
+                self._plot_spectrum(self.spectrum_axs[i], roi[0], roi[1])
                 self._add_patch(i, roi[0], roi[1])
             
     def _clear_bottom_grid(self):
@@ -182,7 +162,7 @@ class Dashboard:
         self.ax_image_plot.add_patch(rect)
         self.patches[index] = rect
     
-    def _remove_patches(self, index):
+    def _remove_patches(self):
         # removes all patches from the current ax_image_plot
         for i, patch in enumerate(self.patches):
             if patch != None:
@@ -197,9 +177,9 @@ class Dashboard:
         ax.set_ylim(y[1], y[0])
         ax.set_axis_off()
     
-    def _plot_spectrum(self, index, ax, x, y):
+    def _plot_spectrum(self, ax, x, y):
         # reads the spectral data from the datastack and plots it next to the roi
-        ds = maxrf4u.DataStack(self.datastack_files[index])
+        ds = maxrf4u.DataStack(self.datastack_file)
         cube = ds.read('maxrf_cube', compute=False)
         x_keVs = ds.read('maxrf_energies')
         roi = cube[y[0]:y[1],x[0]:x[1]]
@@ -208,35 +188,32 @@ class Dashboard:
         ax.plot(x_keVs, y_mean)
         ax.set_xticks([])
 
-    def _plot_mos(self, index):
+    def _plot_mos(self):
         # plots the saved moseley spectra back into the plot
         for i, ax in enumerate(self.mos_axs):
             ax.clear()
-            if self.plot_data[index]['mos_elements'][i] != None:
-                for elem in self.plot_data[index]['mos_elements'][i]:
+            if self.plot_data['mos_elements'][i] != None:
+                for elem in self.plot_data['mos_elements'][i]:
                     xf = mos.XFluo(elem, tube_keV=25)
                     xf.plot(ax=ax, tight_layout=False)
         
-    def swap_image(self, index):
+    def reload_dash(self):
         '''Swap the main image shown in the dashboard
-        
-        index: the index of the datastack file given in the datastack_files list'''
+        '''
         # remove all current patches on the plot
-        self._remove_patches(self.current_index)
+        self._remove_patches()
         # read the highres image and the extent from the datastack file
-        ds = maxrf4u.DataStack(self.datastack_files[index])
+        ds = maxrf4u.DataStack(self.datastack_file)
         self.image = ds.read('imvis_reg_highres')
         self.extent = ds.read('imvis_extent')
         # plots the image on the ax_image_plot
         self.ax_image_plot.imshow(self.image, extent=self.extent)
-        self.ax_image_plot.set_title(f'[{index}] {self.plot_data[index]["object_name"]}')
+        self.ax_image_plot.set_title(f'{self.plot_data["object_name"]}')
         # update the elemgrid to contain the new element maps
-        self._update_elemap_plot(index, ds)
+        self._update_elemap_plot(ds)
         # fills the regions of interest based on saved data
-        self._update_roi_plot(index)
-        self._plot_mos(index)
-        # updates the current_index variable
-        self.current_index = index
+        self._update_roi_plot()
+        self._plot_mos()
 
     def toggle_equalize(self):
         '''Toggles if you want to see equalized element maps or not
@@ -255,9 +232,9 @@ class Dashboard:
         # adds patch to the main image highlighting the area
         self._add_patch(index, x, y)
         # plots the corresponding spectrum based on the datacube
-        self._plot_spectrum(self.current_index, self.spectrum_axs[index], x, y)
+        self._plot_spectrum(self.spectrum_axs[index], x, y)
         # adds the coordinates to the saved data
-        self.plot_data[self.current_index]['rois'][index]= (x, y)
+        self.plot_data['rois'][index]= (x, y)
 
     def add_mos_element(self, index, elem):
         '''Adds moseley spectrum to the corresponding region of interest in the dashboard
@@ -270,10 +247,10 @@ class Dashboard:
         # plots the spectra into the right axes
         xf.plot(ax=self.mos_axs[index], tight_layout=False)
         # if the index of the moseley spectra doesn't contain a list yet, create one. else append to the list
-        if self.plot_data[self.current_index]['mos_elements'][index] == None:
-            self.plot_data[self.current_index]['mos_elements'][index] = [elem]
+        if self.plot_data['mos_elements'][index] == None:
+            self.plot_data['mos_elements'][index] = [elem]
         else:
-            self.plot_data[self.current_index]['mos_elements'][index].append(elem)
+            self.plot_data['mos_elements'][index].append(elem)
 
     def remove_mos_element(self, index, elem):
         '''Removes a moseley spectrum from the corresponding region of interest
@@ -282,9 +259,9 @@ class Dashboard:
         
         elem: The chemical symbol of the element e.g. "Pb"'''
         # if element in the list of elements then remove
-        if elem in self.plot_data[self.current_index]['mos_elements'][index]:
-            self.plot_data[self.current_index]['mos_elements'][index].remove(elem)
-            self._plot_mos(self.current_index)
+        if elem in self.plot_data['mos_elements'][index]:
+            self.plot_data['mos_elements'][index].remove(elem)
+            self._plot_mos()
         else:
             print("Element not in list")
             
@@ -304,17 +281,3 @@ class Dashboard:
         y = tuple(int(x) for x in self.ax_image_plot.get_ylim())
         y = y[::-1]
         return x, y
-
-    def create_swap_widget(self):
-        '''Makes a widget to easily swap between pages.'''
-        options = []
-        for i in range(len(self.datastack_files)):
-            options.append((self.plot_data[i]['object_name'], i))
-        drop = widgets.Dropdown(
-            options=options,
-            value=0,
-            description='Page:',
-        )
-        widgets.interact(self.swap_image, index=drop)
-
-            
