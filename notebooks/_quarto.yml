@@ -1,0 +1,28 @@
+project:
+  type: website
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+website:
+  page-navigation: true
+  twitter-card: false 
+  open-graph: true 
+  repo-actions: [issue]
+  search:
+    location: navbar
+    type: textbox
+  navbar:
+    background: primary
+    search: true 
+    right: 
+      - icon: github
+        href: https://github.com/fligt/falnama-dev
+  sidebar: 
+    style: floating 
+
+
+metadata-files: [nbdev.yml, sidebar.yml]
