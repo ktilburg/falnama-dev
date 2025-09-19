@@ -5,12 +5,12 @@
 # %% auto 0
 __all__ = ['Falnama_maxrf_data']
 
-# %% ../notebooks/10_it-all-starts-with-FAIR-data.ipynb 20
+# %% ../notebooks/10_it-all-starts-with-FAIR-data.ipynb 21
 import pooch
 import tqdm
 from glob import glob
 
-# %% ../notebooks/10_it-all-starts-with-FAIR-data.ipynb 21
+# %% ../notebooks/10_it-all-starts-with-FAIR-data.ipynb 22
 class Falnama_maxrf_data: 
     '''Use this class to download MA-XRF data to download and cache the '.datastack' files onto your local computer once. 
 
