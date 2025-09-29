@@ -5,7 +5,7 @@ __all__ = ['elem_colors', 'plot_roi_peak_patterns', 'get_hotmax_spectra', 'plot_
            'plot_element_lines', 'get_roi_maps', 'plot_roi_maps', 'get_nmf_map', 'pick_nmf_elementmap', 'get_slice_map',
            'get_roi_ims', 'plot_roi_dashboard']
 
-# %% ../notebooks/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 22
+# %% ../notebooks/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 23
 import falnama as fn
 import matplotlib.pyplot as plt
 import maxrf4u as mx  
@@ -16,9 +16,9 @@ import matplotlib.cm as cm
 import skimage.exposure as ske
 from matplotlib.patches import Rectangle
 import re
-from ipywidgets import widgets
+from ipywidgets import widgets 
 
-# %% ../notebooks/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 23
+# %% ../notebooks/20_a-dashboard-for-exploring-our-maxrf-data.ipynb 24
 elem_colors = {'Pb': 'k', 'Au': 'orange', 'Fe': 'brown', 'Ca': 'g', 'K': 'b', 'As': 'magenta', 'Na': 'blue', 'Ni': 'red', 'Cu': 'green', 'Ti': 'blue', 'Zn': 'red'}
 
 def plot_roi_peak_patterns(roi_cube, prominence=2, ax=None): 
@@ -281,11 +281,34 @@ def plot_roi_peak_patterns(roi_cube, prominence=2, ax=None):
     return peak_idxs_list 
 
 
+# roi_cubes, roi_ims, roi_elements_list, nmf_elementmaps, x_keVs, imvis_highres, extent, object_num, xylims_list
 
-def plot_roi_dashboard(roi_cubes, roi_ims, roi_elements_list, nmf_elementmaps, x_keVs): 
+def plot_roi_dashboard(datastack_file, xylims_list, roi_elements_list): #, roi_cubes, roi_ims, , nmf_elementmaps, x_keVs, imvis_highres, extent, object_num, xylims_list): 
     '''Create tabbed plot for roi spectra. '''
 
-    edgecolors = ['violet', 'cyan', 'blue', 'red', 'white', 'orange', 'brown', 'maroon']
+    
+    # initialize variables 
+    # datastack only 
+    edgecolors = ['violet', 'cyan', 'blue', 'red', 'white', 'orange', 'brown', 'green', 'maroon', 'black']
+
+    ds = mx.DataStack(datastack_file)
+    
+    object_num = re.sub(r'.*(WM-71803-\d\d).*', r'\1', datastack_file) 
+    
+    cube = ds.read('maxrf_cube', compute=False)
+    imvis_highres = ds.read('imvis_reg_highres')
+    imvis = ds.read('imvis_reg')
+    extent = ds.read('imvis_extent')
+    x_keVs = ds.read('maxrf_energies')
+    y_maxspectrum = ds.read('maxrf_maxspectrum')
+    
+    nmf_elementmaps = ds.read('nmf_elementmaps') 
+
+    ppa = mx.Peak_Pattern_Atlas(datastack_file=datastack_file, tube_keV=23)
+    
+    # ROI specific 
+    roi_cubes = [cube[l:k, i:j].compute() for i, j, k, l in xylims_list] 
+    roi_ims = get_roi_ims(datastack_file, xylims_list)
     
     # initialize tabs 
     sub_tab=[widgets.Output() for i in range(len(roi_cubes))]
